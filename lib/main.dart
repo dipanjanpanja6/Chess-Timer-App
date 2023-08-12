@@ -1,5 +1,6 @@
 import 'package:chess_timer/screens/home.dart';
 import 'package:flutter/material.dart';
+// Import WidgetsFlutterBinding
 
 void main() {
   runApp(const ChessClockApp());
@@ -16,6 +17,7 @@ class ChessClockApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const ChessClockScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

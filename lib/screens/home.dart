@@ -10,50 +10,73 @@ class ChessClockScreen extends StatefulWidget {
 class _ChessClockScreenState extends State<ChessClockScreen> {
   late DateTime _player1StartTime;
   late DateTime _player2StartTime;
-  Duration _player1Time = Duration(minutes: 5);
-  Duration _player2Time = Duration(minutes: 5);
+  Duration _player1Time = const Duration(minutes: 5);
+  Duration _player2Time = const Duration(minutes: 5);
   bool _isPlayer1Active = true;
   bool _isRunning = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chess Clock'),
+      body: Column(
+        children: [
+          Expanded(
+              flex: _isPlayer1Active ? 2 : 1,
+              child: RotatedBox(
+                  quarterTurns: 2,
+                  child: GestureDetector(
+                      onTap: () {
+                        if (!_isRunning) {
+                          setState(() {
+                            _isPlayer1Active = true;
+                          });
+                          startTimer();
+                        }
+                      },
+                      child: buildPlayerTimer(_isPlayer1Active, _player1Time)))),
+          Container(
+            color: Colors.grey,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(onPressed: _isRunning ? null : startTimer, icon: const Icon(Icons.play_arrow)),
+                  const SizedBox(width: 20),
+                  IconButton(onPressed: _isRunning ? stopTimer : null, icon: const Icon(Icons.stop)),
+                  const SizedBox(width: 20),
+                  IconButton(onPressed: resetTimer, icon: const Icon(Icons.refresh)),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+              flex: _isPlayer1Active ? 1 : 2,
+              child: GestureDetector(
+                  onTap: () {
+                    if (!_isRunning) {
+                      setState(() {
+                        _isPlayer1Active = false;
+                      });
+                      startTimer();
+                    }
+                  },
+                  child: buildPlayerTimer(!_isPlayer1Active, _player2Time))),
+        ],
       ),
-      body: Center(
+    );
+  }
+
+  Widget buildPlayerTimer(bool isActive, Duration time) {
+    return Container(
+      color: isActive ? Colors.blue : Colors.transparent, // Set the background color
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              _isPlayer1Active ? 'Player 1' : 'Player 2',
-              style: const TextStyle(fontSize: 24),
-            ),
+            Text(isActive ? 'Player 1' : 'Player 2', style: const TextStyle(fontSize: 24)),
             const SizedBox(height: 20),
-            Text(
-              formatDuration(_isPlayer1Active ? _player1Time : _player2Time),
-              style: const TextStyle(fontSize: 48),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _isRunning ? null : startTimer,
-                  child: const Text('Start'),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: _isRunning ? stopTimer : null,
-                  child: const Text('Stop'),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: resetTimer,
-                  child: const Text('Reset'),
-                ),
-              ],
-            ),
+            Text(formatDuration(time), style: const TextStyle(fontSize: 48)),
           ],
         ),
       ),
@@ -90,7 +113,7 @@ class _ChessClockScreenState extends State<ChessClockScreen> {
     });
 
     if (_isRunning) {
-      Future.delayed(Duration(seconds: 1), runTimer);
+      Future.delayed(const Duration(seconds: 1), runTimer);
     } else {
       switchPlayers();
     }
@@ -110,10 +133,10 @@ class _ChessClockScreenState extends State<ChessClockScreen> {
   void resetTimer() {
     setState(() {
       _isRunning = false;
-      _player1Time = Duration(minutes: 5);
-      _player2Time = Duration(minutes: 5);
-      _player1StartTime = null;
-      _player2StartTime = null;
+      _player1Time = const Duration(minutes: 5);
+      _player2Time = const Duration(minutes: 5);
+      _player1StartTime = DateTime.now();
+      _player2StartTime = DateTime.now();
       _isPlayer1Active = true;
     });
   }
